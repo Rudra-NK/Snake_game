@@ -4,7 +4,7 @@ const scoreEl = document.getElementById("score");
 const retryBtn = document.getElementById("retry");
 
 const box = 20; // grid size
-let snake, food, d, score, game;
+let snake, food, d, score, game, speed;
 
 function initGame() {
     // Reset variables
@@ -15,12 +15,13 @@ function initGame() {
     };
     d = null;
     score = 0;
+    speed = 160; // start slow
     scoreEl.innerText = "Score: 0";
     retryBtn.classList.add("hidden");
 
     // Start game loop
     clearInterval(game);
-    game = setInterval(draw, 130); // adjust 100 for speed (lower = faster)
+    game = setInterval(draw, speed);
 }
 
 // Keyboard controls
@@ -53,6 +54,17 @@ function collision(head, array) {
     return array.some(segment => head.x === segment.x && head.y === segment.y);
 }
 
+function updateSpeed() {
+    // From score 0 → 20, speed goes 160 → 80
+    // After score 20, stays at max speed (80)
+    let newSpeed = 160 - Math.min(score, 20) * 4;
+    if (newSpeed !== speed) {
+        speed = newSpeed;
+        clearInterval(game);
+        game = setInterval(draw, speed);
+    }
+}
+
 function draw() {
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -80,17 +92,22 @@ function draw() {
     if (snakeX === food.x && snakeY === food.y) {
         score++;
         scoreEl.innerText = "Score: " + score;
+
+        // Generate new food
         food = {
             x: Math.floor(Math.random() * (canvas.width / box)) * box,
             y: Math.floor(Math.random() * (canvas.height / box)) * box,
         };
+
+        // ✅ Speed up gradually
+        updateSpeed();
     } else {
         snake.pop();
     }
 
     let newHead = { x: snakeX, y: snakeY };
 
-    // ✅ Fixed wall collision (snake only dies after touching wall fully)
+    // Wall & self collision
     if (
         snakeX < 0 ||
         snakeY < 0 ||
