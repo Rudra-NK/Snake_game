@@ -20,7 +20,7 @@ function initGame() {
 
     // Start game loop
     clearInterval(game);
-    game = setInterval(draw, 100);
+    game = setInterval(draw, 130); // adjust 100 for speed (lower = faster)
 }
 
 // Keyboard controls
@@ -90,12 +90,12 @@ function draw() {
 
     let newHead = { x: snakeX, y: snakeY };
 
-    // Game over check
+    // ✅ Fixed wall collision (snake only dies after touching wall fully)
     if (
         snakeX < 0 ||
         snakeY < 0 ||
-        snakeX >= canvas.width ||
-        snakeY >= canvas.height ||
+        snakeX > canvas.width - box ||
+        snakeY > canvas.height - box ||
         collision(newHead, snake)
     ) {
         clearInterval(game);
