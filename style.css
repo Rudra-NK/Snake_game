@@ -43,3 +43,13 @@ button:hover {
     background: #00ff00;
     color: black;
 }
+
+/* Retry button */
+#retry {
+    margin-top: 20px;
+    font-size: 20px;
+}
+
+.hidden {
+    display: none;
+}

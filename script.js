@@ -1,24 +1,30 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const scoreEl = document.getElementById("score");
+const retryBtn = document.getElementById("retry");
 
 const box = 20; // grid size
-let score = 0;
+let snake, food, d, score, game;
 
-// Snake starting position
-let snake = [{ x: 9 * box, y: 10 * box }];
+function initGame() {
+    // Reset variables
+    snake = [{ x: 9 * box, y: 10 * box }];
+    food = {
+        x: Math.floor(Math.random() * (canvas.width / box)) * box,
+        y: Math.floor(Math.random() * (canvas.height / box)) * box,
+    };
+    d = null;
+    score = 0;
+    scoreEl.innerText = "Score: 0";
+    retryBtn.classList.add("hidden");
 
-// Food position
-let food = {
-    x: Math.floor(Math.random() * (canvas.width / box)) * box,
-    y: Math.floor(Math.random() * (canvas.height / box)) * box,
-};
-
-let d; // direction
+    // Start game loop
+    clearInterval(game);
+    game = setInterval(draw, 100);
+}
 
 // Keyboard controls
 document.addEventListener("keydown", direction);
-
 function direction(event) {
     if (event.keyCode === 37 && d !== "RIGHT") d = "LEFT";
     else if (event.keyCode === 38 && d !== "DOWN") d = "UP";
@@ -26,7 +32,7 @@ function direction(event) {
     else if (event.keyCode === 40 && d !== "UP") d = "DOWN";
 }
 
-// Mouse/Touch button controls
+// Button controls
 document.getElementById("up").addEventListener("click", () => {
     if (d !== "DOWN") d = "UP";
 });
@@ -39,6 +45,9 @@ document.getElementById("left").addEventListener("click", () => {
 document.getElementById("right").addEventListener("click", () => {
     if (d !== "LEFT") d = "RIGHT";
 });
+
+// Retry button event
+retryBtn.addEventListener("click", initGame);
 
 function collision(head, array) {
     return array.some(segment => head.x === segment.x && head.y === segment.y);
@@ -90,12 +99,12 @@ function draw() {
         collision(newHead, snake)
     ) {
         clearInterval(game);
-        alert("Game Over! Your score: " + score);
+        retryBtn.classList.remove("hidden"); // Show retry button
         return;
     }
 
     snake.unshift(newHead);
 }
 
-// Run the game every 100ms
-let game = setInterval(draw, 100);
+// Start the game first time
+initGame();
